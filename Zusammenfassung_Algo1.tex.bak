@@ -1,0 +1,765 @@
+\documentclass[11pt]{article}
+\usepackage{fullpage}
+\usepackage{amsfonts}
+%Fancy H?
+%Funktioniert nicht.
+\usepackage{amsmath,amssymb}
+\usepackage{mathtools}
+\usepackage{calc} 
+%Damit die descriptions sich schön auflisten 
+\usepackage{enumitem} 
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+%erstellen von pseudo-Algorithmen
+\usepackage[linesnumbered,lined,boxed,commentsnumbered,ruled,vlined]{algorithm2e}
+%Zum einfärben von Texten
+\usepackage[usenames,vipsnames,svgnames,table]{xcolor}
+%Zum erstellen des Index
+\usepackage{makeidx}
+\usepackage[colorlinks=false, pdfborder={0 0 0}]{hyperref}
+\makeindex
+
+\title{Algorithmen 1 Zusammenfassung}
+\author{Jean-Pierre v. d. Heydt}
+\date{\today}
+
+\def \dozent{Müller Quade}
+\def \texcol{RoyalBlue}
+
+\begin{document}
+
+\tableofcontents
+
+\maketitle
+
+\section{Einführung}
+
+\subsection{Pseudocode\index{Pseudocode}}
+
+\glqq Mir wäre lieber, der Programmcode würde aussehen wie Pseudocode.\grqq{} -\dozent
+
+\begin{description}[leftmargin=!,labelwidth=\widthof{\bfseries Deklaration}]
+\item[Zuweisung]$\coloneqq$
+\item[Kommentar]//
+\item[Ausdrücke]Reguläre Verwendung mathematischer Ausdrücke
+\item[Deklaration]$x=c\ :\text{Digit}\ (c\in\mathbb{N})$
+\item[Array]$a:\text{Array}[0\dots n-1]\ \text{of Digit}$
+\item[Schleifen]for, while, repeat\dots until,\dots
+\item[assert] Aussage über den Zustand der Programmausführung (Z.b. Schleifeninvarianten)
+\item[invariant] Aussage, die an \glqq  vielen\grqq{} Stellen im Programm stimmt
+\end{description}
+
+\subsection{O-Kalkül\index{O-Kalkül}}
+
+\paragraph{Definitionen:}
+\begin{enumerate}
+\item $O(f(n))\coloneqq \{ g(n):\textcolor{\texcol}{\exists} c>0:\exists n_{0}\in \mathbb{N} :\forall n\geq n_{0}:g(n)\textcolor{\texcol}{\leq} c*f(n)\}$ 
+\item $\Omega (f(n))\coloneqq \{ g(n):\textcolor{\texcol}{\exists} c>0:\exists n_{0}\in \mathbb{N} :\forall n\geq n_{0}:g(n)\textcolor{\texcol}{\geq} c*f(n)\}$ 
+\item $\Theta (f(n)) \coloneqq O(f(n))\cap \Omega (f(n))$ 
+\item $o(f(n))\coloneqq \{ g(n):\textcolor{\texcol}{\forall} c>0:\exists n_{0}\in \mathbb{N} :\forall n\geq n_{0}:g(n)\textcolor{\texcol}{\leq} c*f(n)\}$ 
+\item $\omega (f(n))\coloneqq \{ g(n):\textcolor{\texcol}{\forall} c>0:\exists n_{0}\in \mathbb{N} :\forall n\geq n_{0}:g(n)\textcolor{\texcol}{\geq} c*f(n)\}$ 
+\end{enumerate}
+
+Die Anwendung dieser Definitionen hängt unter anderem von der konkreten Verwendung eines Maschinenmodells ab. Dies wird in der Vorlesung aber ausdrücklich nicht behandelt.
+
+\paragraph{Beweismöglichkeiten:}\mbox{}\\
+
+Für nicht-negative $f,g\colon\mathbb{N}\to\mathbb{R}$ gelten folgende Aussagen:
+\begin{itemize}
+\item $f(n) \in o(g(n)) \Longleftrightarrow \lim\limits_{n\to \infty}\frac{f(n)}{g(n)}=0$
+\item $f(n) \in \omega (g(n)) \Longleftrightarrow \lim\limits_{n\to \infty}\frac{f(n)}{g(n)}=\infty$ Notiz: Folien sehen hier limsup vor. Ich halte das für falsch.
+\item $f(n) \in \Theta (g(n)) \Longleftarrow 0 < \lim\limits_{n\to \infty}\frac{f(n)}{g(n)}=c < \infty$
+\item $f(n) \in O(g(n)) \Longleftrightarrow 0 \leq \limsup\limits_{n\to \infty}\frac{f(n)}{g(n)}=c < \infty$
+\item $f(n) \in \Omega (g(n)) \Longleftrightarrow 0 < \liminf\limits_{n\to \infty}\frac{f(n)}{g(n)}=c \leq \infty$
+\end{itemize}
+Besonders beim Master Theorem anwendbar ist:
+\begin{itemize}
+\item $f_1, f_2\in \Theta (g(n)), \forall n\in \mathbb{N}: f_1(n) \leq f(n) \leq f_2(n) \Longrightarrow f\in \Theta (g(n))$
+\end{itemize}
+
+\subsection{Master Theorem\index{Master Theorem}}
+
+Mit positive konstanten $a,b,c,d \text{ und } n=b^k, k \in \mathbb{N}$ gilt für:
+
+\[
+T(n) = 	\begin{cases}
+		a & \text{falls } n=1 \\
+		cn + dT(n/b) & \text{falls } n>1
+		\end{cases}
+\]
+,
+\[
+T(n)\in \begin{cases}
+		\Theta (n) & \text{falls } d<b \\
+		\Theta (n\log(n)) & \text{falls } d=b \\
+		\Theta (n^{\log_{b}(d)}) & \text{falls } d>b
+		\end{cases}
+\]
+Dies gilt auch, wenn $x$ in $T(x)$ zur entsprechenden k-ten Potenz aufgerundet wird.
+
+\subsection{Invarianten}
+
+Beweis von Schleifeninvarianten:
+\begin{enumerate}
+\item \textbf{Initialisierung:} Invariante gilt \textcolor{\texcol}{vor} der ersten Iteration.
+\item \textbf{Fortsetzung:} Invariante gilt vor Iteration \textcolor{\texcol}{i}. $\Rightarrow$ Invariante gilt vor Iteration \textcolor{\texcol}{i+1}.
+\item \textbf{Terminierung:} Abbruchbedingung erfüllt $\land$ Invariante gilt $\Rightarrow$ richtiges Ergebnis.
+\end{enumerate}
+
+\section{Folgen, Felder, Listen}
+
+\begin{center}
+	\begin{tabular}{|l|cccc|l|}
+	Operation & \textcolor{\texcol}{List}\index{Liste} & SList & \textcolor{\texcol}	{UArray}\index{Unbound Array} & CArray\index{Cyclic Array} & Erklärung'*'\\
+	\hline
+	$[\cdot]^*$ & n 	& n 	& 1 	& 1 	& heraussuchen eines Elements\\
+	$|\cdot |$ 	& $1^*$ & $1^*$ & 1 	& 1 	& nicht bei splices zwischen verschiedenen Listen\\
+	first 		& 1 	& 1		& 1 	& 1 	& \\
+	last 		& 1 	& 1 	& 1 	& 1 	& \\
+	insert 		& 1 	& $1^*$ & n 	& n 	& nur insertAfter\\
+	remove 		& 1 	& $1^*$	& n 	& n 	& nur removeAfter\\
+	pushBack 	& 1 	& 1 	& $1^*$ & $1^*$ & armortisiert\\
+	pushFront 	& 1 	& 1 	& n 	& $1^*$ & armortisiert\\
+	popBack		& 1 	& n 	& $1^*$	& $1^*$ & armortisiert\\
+	popFront 	& 1 	& 1 	& n 	& $1^*$ & armortisiert\\
+	concat		& 1 	& 1 	& n 	& n 	& \\
+	splice		& 1 	& 1 	& n 	& n 	& \\
+	findNext	& n 	& n 	& $n^*$	& $n^*$ & Cache-effizient\\
+	\end{tabular}
+\end{center}
+
+\subsection{Listen\index{Liste}}
+
+\paragraph{Dummy-Element} Der Vorteil von Dummy-Elementen\index{Dummy-Element}, ist die \textcolor{\texcol}{Vermeidung vieler Sonderfälle} und das \textcolor{\texcol}{Einhalten der Invariante}. Allerdings verbraucht ein Dummy-Element in der Regel mehr \textcolor{\texcol}{Speicherplatz}.
+
+\paragraph{Ausgewählte Operationen}
+\begin{itemize}
+\item \textbf{head(): Handle} gibt den Kopf der Liste zurück
+\item \textbf{isEmpty(): boolean}
+\item \textbf{first(): Handle} gibt das erste Element in der Liste zurück
+\item \textbf{$[i: \mathbb{N}]$: Element} gibt das Element an dem gegebenen Index i zurück. Liegt in $\textcolor{\texcol}{O(n)}$.
+\item \textbf{splice(a,b,t: Handle): void} Hilfsfunktion. Schneidet $\langle \text{a},\dots,\text{b}\rangle$ aus und fügt es hinter t ein. Ist in $O(1)$ möglich.
+\item \textbf{moveAfter(b,a: Handle): void} bewegt das Element b hinter a.
+\item \textbf{remove(b: Handle): void} entfernt b aus der List.
+\item \textbf{insertAfter(x: Element, a: Handle): Handle} Fügt das Element x in die Liste ein und gibt den neuen Handle zurück.
+\item \textbf{findNext(x: Element, from: Handle): Handle} sucht vom Handle from nach dem Element x. Liegt in $\textcolor{\texcol}{O(n)}$.
+\end{itemize}
+
+\paragraph{Vergleich einfach und doppelt verketteter Listen} Einfach verkettete Listen benötigen \textcolor{\texcol}{weniger Speicherplatz}, was auch oft gleichbedeutend ist mit \textcolor{\texcol}{weniger Zeit}. Sie sind jedoch von ihrer Funktionsweise jedoch \textcolor{\texcol}{eingeschränkter (z.B. kein remove)}.
+
+\subsection{Arrays}
+
+\paragraph{Ausgewählte Operationen}
+\begin{itemize}
+\item \textbf{$[i: \mathbb{N}]$: Element} gibt das Element an dem gegebenen Index i zurück. Liegt in $\textcolor{\texcol}{O(1)}$.
+\item \textbf{pushBack(): void} Hängt Element ans Ende an und erhöht die Größe um eins. Wenn kein Platz mehr vorhanden ist, wird das komplette Array umkopiert und größer angelegt.
+\end{itemize}
+
+\paragraph{Armortisierte Analyse\index{Armortisierung}} Jede \textcolor{\texcol}{Operationsfolge $\langle \sigma_{1},\dots,\sigma_{m}\rangle$ von pushBack und popBack} Operationen auf ein anfänglich leeres, unbeschränktes Array liegt in $\textcolor{\texcol}{O(m)}$.
+
+\[O(\underbrace{c\cdot m}_{Gesamtzeit}/\underbrace{m}_{\# Operationen}) = O(1) \]
+
+Bei der \textbf{Konto-Methode\index{Konto-Methode}} werden für die günstigen Operationen Tokens eingezahlt, während bei den teuren Operationen Tokens ausgezahlt werden. Die Anzahl der Tokens dürfen dich nur um einen konstanten Faktor von der Zeitkomplexität der Operation unterscheiden. Ziel ist es, dass das Konto bei jeglichen Eingaben nicht überzogen wird.
+\\
+Mit anderen Worten: Die angenommene amortisierten Kosten sind korrekt, wenn 
+
+\[
+\sum_{i=1}^n T_{Op_{i}} \leq c \cdot \sum_{i=1}^n A_{Op_{i}}
+\]
+
+wobei $T_{Op}$ die Tatsächlichen Kosten und $A_{Op}$ die amortisierten Kosten der Operationsfolge sind.
+
+\subsection{Weitere Datenstrukturen für Folgen}
+
+\begin{description}[leftmargin=!,labelwidth=\widthof{\bfseries Cyclic Array}]
+\item[Stack\index{Stack}] Elemente können draufgelegt und runter genommen werden (Last in First out). Wird bei Tiefensuche\index{Tiefensuche} verwendet.
+\item[FIFO queue\index{FIFO queue}] (First in First out). Wird bei Breitensuche\index{Breitensuche} verwendet.
+\item[Deque\index{Deque}] Steht für double ended queue. An beiden Enden können Elemente verwendet werden.
+\item[Cyclic Array\index{Cyclic Array}] Besonders gut um FIFOS zu realisieren. hat aber eine feste Größe.
+\item[Skip List\index{Skip List}] Randomisierte Datenstruktur mit Einfügen und Lookup \textcolor{\texcol}{erwartet} in $O(\log(n))$.
+\item[Hotlist\index{Hotlist}] Mischung aus Array und Liste. Einfügen, Löschen und Suchen \textcolor{\texcol}{amortisiert} in $O(\sqrt{n})$.
+\end{description}
+
+\section{Hashing}
+
+\paragraph{Bestandteile und Konventionen für Hashtabellen\index{Hashtabelle}}
+
+\begin{itemize}
+\item Speichern einer Menge $\textcolor{\texcol}{M}$ von Elementen.
+\item Statt Elementen aus \textcolor{\texcol}{$M$} verwenden wir \textcolor{\texcol}{Schlüssel} aus der Menge \textcolor{\texcol}{$S$}.
+\item für $\textcolor{\texcol}{e\in M}$ gibt es die Funktion $key\colon M \to S $ welche $\textcolor{\texcol}{key(e)}$ einen Schlüssel zuweist.
+\item wir verwenden $e\in M$ oft äquivalent zu $key(e)\in S$.
+\item Objekte werden in der \textcolor{\texcol}{HashTabelle t} mit \textcolor{\texcol}{$m$ Einträgen} gespeichert.
+\item Eine \textcolor{\texcol}{Hash-Funktion $h\colon S \to \{0,\dots ,m-1\}$\index{Hash-Funktion}} weist Schlüssel einem Platz in der Hashtabelle zu.
+\item Eine Hashtabelle stellt die Funktionen \textcolor{\texcol}{insert($e$), remove($e$)} und \textcolor{\texcol}{find($e$)} erwartet in $\textcolor{\texcol}{O(1)}$ bereit.
+\end{itemize}
+
+\subsection{Hash-Funktion\index{Hash-Funktion}}
+Eine \textcolor{\texcol}{perfekte Hash-Funktion\index{perfekte Hash-Funktion} $h$} bildet Elemente der Menge \textcolor{\texcol}{$M$} eindeutig auf die Einträge von \textcolor{\texcol}{t} ab. Perfekte Hash-Funktionen sind im allgemeinen aber nicht realistisch, da zwei verschiedene Elemente sehr schnell auf den gleichen Eintrag abgebildet werden (vgl. Geburtstagsparadox).
+\begin{itemize} 
+\item Eine Hashfunktion ist nur dann mit vernünftiger Wahrscheinlichkeit perfekt, wenn die Größe der Hashtabelle \textcolor{\texcol}{$m$} quadratisch zur Anzahl der Elemente ist (\textcolor{\texcol}{$m \in \Omega (n^2)$}).
+\item Eine Teilmenge von Hashfunktionen $\mathcal{H}\subset \{h\colon S \to \{0,\dots ,m-1\}\}$ ist \textcolor{\texcol}{universell}\index{universelle Hash-Funktionen}, falls für alle $x,y \in Keys, x \neq y$ und zufälligem $h \in \mathcal{H}\colon \mathbb{P}[h(x)=h(y)]=\frac{1}{m}$.
+\item Die Erwartete Anzahl kollidierender Elemente\index{Kollision} ist \textcolor{\texcol}{$O(1)$, falls $|M|\in O(m)$}.
+\end{itemize}
+
+%TODO ? Abschnitt zu Wahrscheinlichkeiten lasse ich hier aus.
+
+\subsection{Hashing mit verketteten Listen}
+Interpreter die Tabelleneinträge als einfach verkettete Listen und führe bei Kollisionen\index{Kollision} ein neues Element in die Liste ein. \textcolor{\texcol}{insert($e$), remove($e$)} und \textcolor{\texcol}{find($e$)} werden wie erwartet implementiert. \textcolor{\texcol}{Vorteile} sind hier:
+\begin{itemize}
+\item Weniger anfällig gegen Volllaufen
+\item Es kann weiterhin von Außen auf Elemente Zugegriffen werden.
+\item im Gegensatz zur Linearen Suche gibt es Leistungsgarantien
+\end{itemize}
+
+\subsection{Hashing mit Linearer Suche}
+Elemente werden direkt in die Tabelle eingespeichert. Kollisionen\index{Kollision} werden gelöst, indem der nächst freie Platz gesucht wird. Dadurch entsteht zusätzlicher Aufwand beim Löschen. \textcolor{\texcol}{Vorteile} sind vor Allem:
+\begin{itemize}
+\item Platz-effizient
+\item Cache-effizient
+\end{itemize}
+
+\section{Sortieren}
+Sortieralgorithmen finden überall in der Algorithmik Anwendung. Sie werden in der Vorverarbeitung, dem Aufbau von Such- oder Spannbäumen, greedy Algorithmen und vielen anderen Problemen verwendet.
+
+\subsection{Untere Schranke}
+Deterministische vergeliechsbasierte Sortieralgorithmen brauchen im schlechtesten Fall mindestens \textcolor{\texcol}{$\Omega (n\log(n))$ Vergleiche}.
+
+\paragraph{Beweisskizze}
+Sei eine Folge mit \textcolor{\texcol}{$n$} Elementen zu sortieren. Nun gibt es \textcolor{\texcol}{$n!$ mögliche Permutationen der richtigen Reihenfolge} dieser Elemente. Eine Baum-basierte Sortierer-Darstellung muss also mindestens $n!$ Blätter haben, die Ausführungszeit entspricht der \textcolor{\texcol}{Tiefe $T$} des Baumes.\\
+Da ein Baum der Höhe $T$ höchstens $2^T$ Blätter haben kann folgt (über Umwege) die Abschätzung:
+\[
+2^T \geq n! \Longrightarrow T \geq n\log(n) - O(n)
+\]
+Es gibt auch Beweise für randomisierte Algorithmen.
+
+\subsection{Insertionsort\index{Insertionsort}}
+\begin{algorithm}[H]
+\caption{insertionSort}
+\KwData{a: Array[1...n] of Element}
+%\DontPrintSemicolon
+\For{$i\coloneqq2$ \KwTo $n$}{
+	\textbf{invariant} $a[1]\leq\dots\leq a[i-1]$\;
+	\tcc{move $a[i]$ to the right place}
+%	$e\coloneqq a[i]$\;
+%	\eIf(\tcc*[h]{neues Minimum}){$e<a[1]$}{
+%		\For{$j\coloneqq i \text{ downto } 2$}{
+%			$a[j]\coloneqq a[j-1]$\;
+%		}
+%		$a[1]\coloneqq e$\;
+%	}(\tcc*[h]{benutze a[1] als sentinel}){
+%		\For{$j\coloneqq i; a[j-1]>e;j--$}{
+%			$a[j]\coloneqq a[j-1]$
+%		}
+%		$a[j]\coloneqq e$\;
+%	}	
+}
+\end{algorithm}
+
+\paragraph{Laufzeit}
+Liegt im worst case in \textcolor{\texcol}{$O(n^2)$} und im best case in \textcolor{\texcol}{$O(n)$}.
+
+\paragraph{Sonstiges}
+\begin{itemize}
+\item inplace\index{inplace} möglich
+\item Ein Beispiel für das mögliche Rausziehen einer Randbedingung aus der Schleife und Verwenden eines Sentinels\index{Sentinel}.
+\end{itemize}
+
+\subsection{Mergesort\index{Mergesort}}
+\begin{algorithm}[H]
+\caption{mergeSort}
+\KwData{$\langle e_1,\dots ,e_n\rangle$: of Element}
+\eIf{$n=1$}{
+	\tcc{Basisfall}
+	return $e_1$}{
+	\tcc{Zusammenfügen beider Teillisten}
+	return merge(mergeSort($\langle e_1,\dots ,e_{\lfloor n/2\rfloor}\rangle$),mergeSort($\langle e_{\lfloor n/2\rfloor +1}\dots ,e_n\rangle$))}
+\end{algorithm}
+
+\paragraph{Laufzeit}
+Liegt in \textcolor{\texcol}{deterministisch $\Theta (n\log(n))$}.
+
+\paragraph{Sonstiges}
+\begin{itemize}
+\item Der Algorithmus ist stabil\index{stabil} (gleiche Elemente behalten gleiche Reihenfolge).
+\end{itemize}
+
+\subsection{Quicksort\index{Quicksort}}
+\begin{algorithm}[H]
+\caption{quickSort}
+\KwData{s: Sequence of Element}
+\DontPrintSemicolon
+\eIf{$|s| \leq 1$}{
+	\tcc{Basisfall}
+	return s}{
+	\tcc{wähle Pivotelement\index{Pivotelement}}
+	wähle \textcolor{\texcol}{ein gewisses} $p \in s$\;
+	$a\coloneqq \langle e\in s\colon e<p\rangle$\;
+	$a\coloneqq \langle e\in s\colon e=p\rangle$\;
+	$a\coloneqq \langle e\in s\colon e>p\rangle$\;
+	return Konkatenation von quickSort(a), b und quickSort(c)
+}
+\end{algorithm}
+
+\
+
+\paragraph{Laufzeit}
+Kann im worst case in \textcolor{\texcol}{$O(n^2)$} liegen. Im best case würde immer der Median\index{Median} ausgewählt und die Laufzeit läge in  \textcolor{\texcol}{$O(n\log(n))$}. Bei zufälliger Wahl des Pivotelements liegt der Algorithmus \textcolor{\texcol}{erwartet in $O(n\log(n))$}.
+
+\paragraph{Beweisskizze für erwartete Laufzeit}
+\begin{itemize}
+\item Bei zufälliger Pivot-Wahl ist das Aufspaltverhältnis mit einer Wahrscheinlichkeit von $\frac{1}{2}$ nicht schlechter als $\frac{1}{4}:\frac{3}{4}$.
+\item Die Wahrscheinlichkeit, dass $e_i$ und $e_j$ miteinander verglichen werden ist $\frac{2}{j-i+1}$.
+\item Die Anzahl aller Vergleiche ist $\sum_{i=1}^n \sum_{j=i+1}^n \frac{2}{j-i+1} \leq 2n\sum_{k=2}^n \frac{1}{k}\leq 2n\ln(n)$.
+\item Die letzte Abschätzung ist eine Abschätzung der harmonischen Summe\index{harmonische Summe}: $\ln(n) \leq \sum_{i=1}^n\frac{1}{i} \leq 1+\ln(n)$.
+\end{itemize}
+
+\paragraph{Sonstiges}
+\begin{itemize}
+\item Es gibt eine Effiziente \textcolor{\texcol}{inplace\index{inplace} Implementierung}. Im Methodenkopf werden die Grenzen des zu sortierenden Array-Teils übergeben. Hier wurde noch nicht der Rekursionsstapel beachtet, welcher $O(\log(n))$ Speicher benötigt.
+\item \textcolor{\texcol}{Quickselect\index{Quickselect}} ist eine Variante, welche das \textcolor{\texcol}{k-te Element einer Folge} in \textcolor{\texcol}{$O(n)$} raussucht.
+\end{itemize}
+
+\subsection{Bucketsort\index{Bucketsort}}
+\begin{algorithm}[H]
+\caption{\textcolor{\texcol}{K}Sort}
+\KwData{s: Sequence of Element}
+\DontPrintSemicolon
+$b=\langle\langle\rangle,\dots ,\langle\rangle\rangle\colon$ Array$[0,\dots ,\textcolor{\texcol}{K}-1]$ of Sequence of Element\;
+\For{each $e\in s$}{
+	$b[key(e)]$.pushBack($e$)\;
+}
+$s\coloneqq$ Konkatenation von $b[0],\dots ,b[\textcolor{\texcol}{K}-1]$\;
+\end{algorithm}
+
+\paragraph{Laufzeit} Laufzeit liegt in $O(n+\textcolor{\texcol}{K})$.
+
+\begin{algorithm}[H]
+\caption{LSDRadixSort\index{Radixsort}}
+\KwData{s: Sequence of Element}
+\DontPrintSemicolon
+\For{$i\coloneqq 0$ \KwTo $d-1$}{
+	\tcc{wählt i-te Stelle der zahl als key}
+	definiere key(x) als $(x\ div\ K^i)\ mod\ K$\;
+	KSort(s)\;}
+\end{algorithm}
+
+\paragraph{Laufzeit} Laufzeit liegt in $O(\textcolor{\texcol}{d}(n+\textcolor{\texcol}{K}))$ wobei \textcolor{\texcol}{$d$ die Anzahl der Stellen der größten Zahl} ist und \textcolor{\texcol}{$K$ die Basis}.
+
+\paragraph{Sonstiges}
+\begin{itemize}
+\item Ist nicht inplace\index{inplace}.
+\item Ganzzahlige Sortieralgorithmen sind asymptotisch schnelle machen aber mehr Annahmen als vergleichsbasierte über die zu sortierenden Daten.
+\end{itemize}
+
+\section{Prioritätslisten\index{Prioritätsliste}}
+
+Verwaltet eine Menge \textcolor{\texcol}{$M$} von Elementen mit Schlüssel und stllt im wesentlichen die Operationen \textcolor{\texcol}{insert(e)} und \textcolor{\texcol}{deleteMin} bereit. Die zentrale Eigenschaft eines Heaps ist:
+\textcolor{\texcol}{\[ \text{Baum mit } \forall v \in M \colon \text{parent} (v) \leq v \]}
+
+\subsection{Heap\index{Heap}}
+
+Ein binärer Heap mit \textcolor{\texcol}{n} Elementen ist ein \textcolor{\texcol}{Binärbaum\index{Baum} der Höhe $\lfloor\log(n) \rfloor$}. Fehlende Blätter stehen unten rechts. Das \textcolor{\texcol}{Minimum} Des Baumes steht immer an seiner Wurzel.\\
+
+\glqq Wenn man deine Mutter in den Heap einfügt liegt das in $O(\sqrt{n})$.\grqq{} -\dozent\\
+
+\paragraph{Implizite Baum-Repräsentation} Der Heap wird \textcolor{\texcol}{in einem Array gespeichert}. Hierbei wird jede Schicht des Baumes nacheinander im Array abgelegt. Dabei ergibt sich: parent(j) = $\lfloor j/2 \rfloor$, linkesKind(j) = $2j$ und rechtesKind(j) = $2j+1$.\\
+
+Eine Wichtige Hilfsoperation, die beim \textcolor{\texcol}{Einfügen} neuer Elemente in den Heap gebraucht wird ist \textcolor{\texcol}{siftUp}. Hingegen wird \textcolor{\texcol}{siftDown} beim \textcolor{\texcol}{Entfernen} des kleinsten Elements gebraucht.
+
+\begin{algorithm}[H]
+\caption{siftUp}
+\KwData{i: $\mathbb{N}$}
+\DontPrintSemicolon
+\eIf{$i=1$ oder $h[$parent$(i)] \leq h[i]$}{
+	return}{
+	tausche($h[$parent$(i)],\ h[i]$)\;
+	siftUp(parent$(i)$)}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{siftDown}
+\KwData{i: $\mathbb{N}$}
+\DontPrintSemicolon
+\tcc{Überprüfe ob i mindestens ein Kind hat}
+\If{linkesKind$(i)\leq n$}{
+\tcc{wähle kleineres Kind aus}
+	\eIf{rechtesKind$(i)>n$ oder $h[$linkesKind$(i)]\leq h[$rechtesKind$(i)]$}{
+		$m\coloneqq$ linkesKind$(i)$}{
+		$m\coloneqq$ rechtesKind$(i)$}
+	\If{$h[i]>h[m]$}{
+		tausche($h[i],\ h[m])$\;
+		siftDown($m$)\;}}
+\end{algorithm}
+
+\paragraph{Laufzeit und Heapsort\index{Heapsort}} 
+\textcolor{\texcol}{min} liegt in \textcolor{\texcol}{$O(1)$}. \textcolor{\texcol}{insert} und \textcolor{\texcol}{deleteMin} liegen beiden in \textcolor{\texcol}{$O(\log(n)$}. Um einen Heap zu bauen wird $n/2$ mal Adressierbare \textcolor{\texcol}{siftDown} ausgeführt, dies liegt in \textcolor{\texcol}{$O(n)$}. Somit ist auch ein Heapsort möglich. Dieser liegt in \textcolor{\texcol}{$O(n\log(n))$} und ist inplace\index{inplace}.
+
+\subsection{Adressierbare Prioritätslisten\index{adressierbare Prioritätslisten}}
+Eine adressierbare Prioritätsliste biete im Wesentlichen die gleichen Funktionalitäten wie ein Heap, besitzt aber noch die Möglichkeit den \textcolor{\texcol}{Key eines bereits eingefügten Elements zu verringern} und \textcolor{\texcol}{beliebige Elemente aus der Liste zu entfernen}.\\
+Solch adressierbare Prioritätslisten finden vor Allem bei Greedy-Algorithmen\index{Greedy-Algorithmus} Anwendung. Die Implementierung unterscheidet sich nicht gtoß von einem normalen Heap, grob gesagt, werden jetzt Proxy-Elemente vorgeschoben.
+
+\paragraph{Fibonacci-Heap\index{Fibonacci-Heap}}
+besonders beliebt unter Algorithmikern ist der Fibonacci-Heap, der sich durch \textcolor{\texcol}{insert}, \textcolor{\texcol}{remove} und \textcolor{\texcol}{updateKey} amortisiert in $O(1)$ und \textcolor{\texcol}{deleteMin} in $O(\log(n))$ auszeichnet. In der Praxis hat dieser jedoch zu hohe konstante Faktoren.
+
+\section{Sortierte Liste}
+
+Wird gelegentlich als Synonym für Suchbaum verwendet.
+
+\subsection{Funktionen}
+\begin{itemize}
+\item \textbf{Locate(k: Element)} Ist die kennzeichnende Funktion einer sortierten Liste. Mit Hilfe einer \textcolor{\texcol}{binären Suche\index{binäre Suche}} wird in \textcolor{\texcol}{$O(\log(n))$} das Element gefunden, welches als erstes größer als k ist ($M$.locate$(k)\coloneqq \min\{e\in M\colon e\geq k\}$).
+\item \textbf{min(): Element, max(): Element} in \textcolor{\texcol}{$O(1)$}.
+\item \textbf{insert(e: Element), remove(e: Element)} in \textcolor{\texcol}{$O(\log(n))$} für $a,b \in O(1)$.
+\item \textbf{rangeSearch(a,b: Element): List of Element} gibt alle Elemente zurück, die größer gleich a und kleiner gleich b sind. Liegt in \textcolor{\texcol}{$O(\log(n)+|\text{result}|)$}.
+\item \textbf{build()} in \textcolor{\texcol}{$O(n)$}
+\item \textbf{concate(s: Sortierte Folge), split(i: $\mathbb{N}$)} in \textcolor{\texcol}{$O(\log(n))$}
+\item \textbf{merge(N: Sortierte Folge, M: Sortierte Folge)} wenn $n=|N|\leq m=|M|$ in \textcolor{\texcol}{$O(n\log(\frac{m}{n}))$}.
+\end{itemize}
+
+\subsection{Vergleich zu anderen Datenstrukturen}
+\begin{itemize}
+\item \textbf{Hash-Tabelle\index{Hash-Tabelle}} hat insert, remove und find aber kein locate
+\item \textbf{Prioritätslisten\index{Prioritätsliste}} hat insert, delteMin und schnelleres mergen aber \textbf{min()} nicht in \textcolor{\texcol}{$O(1)$}.
+\end{itemize}
+
+\subsection{[a,b]-Bäume\index{(a,b)-Baum}}
+Alle Knoten (abgesehen von den Blättern) haben einen \textcolor{\texcol}{Grad zwischen a und b}. Es muss gelten: $a\geq 2$ und $b\geq 2a-1$. Die Höhe des Baumes \textcolor{\texcol}{$h$} ist: $h\leq 1+\lfloor\log_a\frac{n+1}{2}\rfloor$.
+
+\paragraph{Insert und Remove} unsere (a,b)-Bäume verwenden zwei etwas kompliziertere Funktionen an, die im Folgenden kurz angerissen werden. \textcolor{\texcol}{Insert spaltet\index{split} einen Knoten in zwei kleinere auf}, wenn der neu entstehende Knoten zu groß wäre. \textcolor{\texcol}{Remove fügt zwei Knoten zusammen\index{fuse} oder balanciert\index{balance}} diese, wenn der entstehende Knoten zu klein wäre.
+
+\begin{algorithm}[H]
+\caption{insert}
+\KwData{e: Element}
+\DontPrintSemicolon
+füge e an die richtige Stelle in der Liste ein\;
+füge key(e) als neuen Splitter in den Vorgänger u ein\;
+\tcc{Grad zu groß}
+\If{$u.d=b+1$}{
+	\textcolor{\texcol}{splitte\index{split}} u in 2 Knoten mit Graden $\lfloor (b+1)/2\rfloor, \lceil (b+1)/2\rceil$\;
+	weiter oben einfügen, ggf. \textcolor{\texcol}{spalten}, ggf. neue Wurzel\;}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{remove}
+\KwData{e: Element}
+\DontPrintSemicolon
+finde Pfad zum Element e\;
+entferne e aus der List\;
+entferne key(e) in Vorgänger u\;
+\tcc{Grad zu klein}
+\If{$u.d = a-1$}{
+	finde Nachbarn u'\;
+	\tcc{wenn zusammenfügen nicht zu groß}
+	\eIf{$u'.d+a-1\leq b$}{
+		\textcolor{\texcol}{fuse(u', u)\index{fuse}}\;
+		Weiter oben splitter entfernen\;
+		ggf. Wurzel entfernen\;}{
+		\textcolor{\texcol}{balane(u', u)\index{balance}}}}
+\end{algorithm}
+
+\section{Graphrepräsentationen}
+
+Wir repräsentierten \textcolor{\texcol}{ungerichtete Graphen\index{ungerichteter Graph}} im Rechner meist als doppelt \textcolor{\texcol}{gerichtete Graphen\index{gerichteter Graph}}.
+
+\paragraph{Begriffe}
+\begin{itemize}
+\item \textbf{DAG} $G=(V,E)$ DAG $\Longleftrightarrow$ $G$ gerichtet und $G$ enthält keine Zyklen. $\Longrightarrow\ G$ lässt sich als obere Dreieckmatrix repräsentieren.
+\item \textbf{verbindbar} zwei Knoten sind genau dann verbindbar, wenn ein Pfad zwischen ihnen existiert.
+\item \textbf{zusammenhängend\index{zusammenhängender Graph}} ein Graph ist genau dann zusammenhängend, wenn alle Knoten verbindbar sind
+\end{itemize}
+
+\subsection{Triviale Darstellung}
+Der Graph wird als Folge von Knotenpaaren gespeichert. Diese Variante ist kompakt und gut für die Ein- und Ausgabe aber bietet fast keine nützlichen Operationen in angemessener Zeit.
+
+\subsection{Adjazenzfelder\index{Adjazenzarray}}
+Knoten werden den Zahlen 1,...,n zugeordnet. \textcolor{\texcol}{Knotenfeld $V$} hat $n+1$ Felder und speichert den Index der ersten ausgehenden Kante in \textcolor{\texcol}{$E$}. \textcolor{\texcol}{Kantenfeld $E$} speichert Ziele der Kante gruppiert nach Startknoten. \textcolor{\texcol}{Dummy-Eintrag} $V[n+1]$ speichert $m+1$.\\
+Ist in der Regel besser für statische Graphen geeignet.
+
+\subsection{Adjazenzliste\index{Adjazenzliste}}
+Ähnlich wie Adjazenzfeld\index{Adjazenzarray} aber speichert das \textcolor{\texcol}{Kantendeld} als einzelne \textcolor{\texcol}{Listen}. Dadurch werden \textcolor{\texcol}{Einfügen und Löschen vereinfacht} aber auch \textcolor{\texcol}{mehr Platz verbraucht und mehr Cache-Misses verursacht}.
+
+\subsection{Adjazenz-Matrix\index{Adjazenz-Matrix}}
+Speichert die Kanten in einer \textcolor{\texcol}{$n\times n$-Matrix C} wobei eine 1 für \textcolor{\texcol}{$c_{ij}$ eine Kante von $i$ nach $j$} repräsentiert.\\
+Diese Darstellung ist plazeffizient für dichte Graphen aber ineffizient für dünne Graphen.
+
+\subsection{Algorithmen}
+\begin{algorithm}[H]
+\caption{isDAG}
+\KwData{$G=(V,E)$: Graph}
+\DontPrintSemicolon
+\tcc{Graph behält die Eigenschaft von vorhandenen bzw. nicht vorhandenen Zyklen}
+\While{$\exists v \in V \colon \text{indegree}(v)=0$}{
+	entferne $v$ und alle eingehenden Kanten}
+return $|V|==0$
+\end{algorithm}
+
+\paragraph{Laufzeit}
+Für $n=|V|,m=|E|$ liegt die Laufzeit in \textcolor{\texcol}{$O(m+n)$}. Der Algorithmus kann gut mit einem \textcolor{\texcol}{Stack\index{Stack}} für alle Knoten mit Eingangsgrad 0 implementiert werden.
+
+\section{Graphtraversierung}
+
+\subsection{Kantenklassifizierung}
+Graphtraversierung hilft uns auch immer dabei, die Kanten eines Baumes zu klassifizieren. Wir unterscheiden dabei zwischen folgenden Kanten:
+
+\begin{itemize}
+\item \textbf{tree\index{tree Kante}} Kante ist ein Element des Waldes, das bei der Suche gebaut wird
+\item \textbf{forward\index{forward Kante}} Kanten verlaufen parallel zu Wegen aus Baumkanten
+\item \textbf{backward\index{backward Kante}} Kanten verlaufen antiparallel zu Wegen aus Baumkanten
+\item \textbf{cross\index{cross Kante}} Kanten verlaufen zwischen zwei Ästen eines Baumes.
+\end{itemize}
+
+\subsection{Breitensuche\index{Breitensuche}}
+Die Breitensuche baut einen Baum auf Grundlage eines Graphen (ungewichtet), der von einem Startknoten $s$ alle von $s$ erreichbaren Knoten mit \textcolor{\texcol}{möglichst kurzen Pfaden} erreicht.
+
+\begin{algorithm}[H]
+\caption{BFS}
+\tcc{BFS steht für breadth-first search}
+\KwData{s: Knoten}
+\DontPrintSemicolon
+$Q\coloneqq\langle s\rangle$: FIFO queue\index{FIFO queue} oder Stack\index{Stack}\;
+\While{$Q\neq \langle\rangle$}{
+	exploriere Knoten in $Q$\;
+	merke Knoten der nächsten Schicht in $Q'$\;
+	$Q\coloneqq Q'$}
+\end{algorithm}
+
+\paragraph{Vorteile/Nachteile}
+\begin{itemize}
+\item nicht rekursiv
+\item keine Vorwärtskanten
+\item findet kürzeste Wege, womit Umgebung eines Knoten definiert werden kann
+\item Bei DAGs sollten zuerst die Wurzeln gesucht werden
+\end{itemize}
+
+\subsection{Tiefensuche\index{Tiefensuche}}
+
+\begin{algorithm}[H]
+\caption{DFS}
+\tcc{DFS steht für depth-first search}
+\tcc{DFS wird mit DFS(s,s) initialisiert}
+\KwData{$u,v$: Knoten}
+\tcc{Erkunde v von u kommend}
+\For{each $(v,w)\in E$}{
+	\eIf{$w$ is marked}{
+		\textcolor{\texcol}{traverseNonTreeEdge$(v,w)$}}{
+		\textcolor{\texcol}{traverseTreeEdge$(v,w)$}\;
+		markiere $w$\;
+		DFS$(v,w)$}}
+\textcolor{\texcol}{backTrack$(u,v)$}
+\end{algorithm}
+
+\paragraph{Vorteile}
+\begin{itemize}
+\item benötigt keine extra Datenstruktur, da er eine Rekursionsstapel verwendet
+\item sehr flexibel einsetzbar
+\end{itemize}
+
+\paragraph{DFS-Nummerierung\index{DFS-Nummerierung}} wird auf $1$ initialisiert, in \textcolor{\texcol}{traverseTreeEdge} aufgerufen und bei dem entsprechenden Knoten um 1 erhöht. Somit bekommt der Startknoten die Nummer 1 und der zuletzt besuchte knoten die Nummer m.
+\paragraph{Fertigstellungszeit\index{finish time}} wird auf $1$ initialisiert, in \textcolor{\texcol}{backTrack} aufgerufen und bei dem entsprechenden Knoten um 1 erhöht. Somit bekommt der Startknoten die Nummer m.
+
+\paragraph{Kantenklassifizierung bei DFS}
+%Diese Tabelle ist theorietisch vielleicht etwas interessant aber meiner Meinung nach praktisch völlig unbrauchbar
+\begin{center}
+\begin{tabular}{|l||l|l|l|}
+Typ $(v,w)$ & dfsNum$[v]<$ dfsNum$[w]$ & finishTime$[v]<$ finishTime$[w]$ & $w$ ist markiert\\
+\hline
+tree		& yes	& yes	& no\\
+forward		& yes	& yes	& yes\\
+backward	& no	& no	& yes\\
+cross		& no	& yes	& yes\\
+\end{tabular}
+\end{center}
+
+\paragraph{Topologische Sortierung\index{topologische Sortierung}}Eine \textcolor{\texcol}{Sortierung $t$ }von Knoten eines Graphen $G=(VE)$ heißt \textcolor{\texcol}{topologische Sortierung}, wenn gilt: 
+\[\forall(u,v)\in E\colon t(u)<t(v)\] 
+Mithilfe von DFS kann eine topologische Sortierung für einen Graphen bestimmt werden. Dazu gilt folgendes Theorem:\\
+$G$ \textcolor{\texcol}{kreisfrei (DAG)} $\Longleftrightarrow$ DFS findet keine Rückwärtskante. Dann liefert $t(v)\coloneqq n -\text{finishTime}[v]$ eine topologische Sortierung.
+
+\section{Kürzeste Wege}
+
+Wir betrachten nun gewichtete Graphen. Das heißt, wir haben eine \textcolor{\texcol}{Kostenfunktion $c\colon E \to \mathbb{R}$}, die jeder Kante einen Wert zuweist. Unser Ziel ist es nun den Pfad mit den niedrigsten Kantengewichten\index{Kantengewicht} zwischen zwei Knoten zu finden.
+
+\subsection{Grundlagen}
+\begin{itemize}
+\item Der kürzeste Pfad zwischen zwei Knoten ist nicht eindeutig bestimmbar, wenn es \textcolor{\texcol}{negative Kreise} gibt.
+\item Wennin einem Graphen mit negativen Kantengewichten ein kürzester Pfad existiert, ist dieser Schleifenfrei.
+\item Teilpfade kürzester Pfade sind selbst kürzeste Pfade
+\end{itemize}
+
+\subsection{Dijkstras Algorithmus\index{Dijkstras Algorithmus}}
+\begin{algorithm}[H]
+\caption{dijkstra}
+\KwData{$G=(V,E)$: Graph, $s$: Knoten}
+\DontPrintSemicolon
+\tcc{vorläufig kürzeste Distanz}
+$d$: Array[$1\dots |V|$] of Digit\;
+\tcc{Vorgänger auf dem vorläufig kürzesten Weg} 
+parent: Array[$1\dots |V|$] of Knoten\;
+$d[s]\coloneqq 0$, parent$[s]\coloneqq s$\;
+ansonsten setzte $d[v]\coloneqq \infty$ und parent$[v]\coloneqq\perp$\;
+setze alle Knoten auf nicht gescannt\;
+\While{$\exists$ ein nicht gescannter Knoten $u$ mit $d[u]<\infty$}{
+	\tcc{verwende adressierbare Prioritätsliste\index{adressierbare Prioritätsliste}}
+	$u\coloneqq$ Knoten $m$, der von allen ungescannten Knoten das kleinste $d[m]$ hat\;
+	relaxiere alle Kanten $(u,v)$ von u\;
+	markiere $u$ als gescannt\;}
+\end{algorithm}
+
+\paragraph{Laufzeit}Ein wesentlicher Bestandteil von Dijkstras Algorithmus ist eine adressierbare \textcolor{\texcol}{Prioritätslist\index{adressierbare Prioritätsliste}}. Daher hängt auch die Laufzeit im wesentlichen von dieser ab. 
+\[T_{\text{Dijkstra}}=O(m\cdot T_{\text{decreaseKey}}(n) + n\cdot (T_{\text{deleteMin}}(n) + T_{\text{insert}}(n)))\]
+Mit unser behandelten Prioritätsliste kommen wir auf $O((m+n)\log(n))$, ein Fibonacci-Heap\index{Fibonacci-Heap} kommt auf $O(m+n\log(n))$.
+
+\subsection{Bellman-Ford-Algorithmus\index{Bellman-Ford-Algorithmus}}
+Dieser Algorithmus relaxiert alle Kanten (in irgendeiner Reihenfolge) $|V|-1$ mal. Dadurch werden \textcolor{\texcol}{alle kürzesten Pfade (ausgenommen $-\infty$)} gefunden. Dieser Algorithmus kommt also auch mit negative Kantengewichten\index{Kantengweicht} zurecht.\\
+Jeder negative Kreis hat nun mindestens einen Knoten, der sich bei erneuter Relaxion vom Gewicht her verringert. Alle von diesen Knoten aus erreichbaren Kanten haben $-\infty$ als Gewicht.
+
+\paragraph{Laufzeit} liegt in $O(n\cdot m)$.
+
+%TODO Verkehrsnetze. Ist das wirklich wichtig?
+
+\section{Minimale Spannbäume\index{minimaler Spannbaum}}
+
+Bei minimalen Spannbäumen arbeiten wir mit ungerichteten Graphen\index{ungerichteter Graph}, die positiven Kantengewichte\index{Kantengewicht} besitzen. Unser Ziel ist es, einen \textcolor{\texcol}{minimalen Baum} zu finden, der alle Knoten verbindet
+
+\subsection{Schnitteigenschaft\index{Schnitteigenschaft}}
+Für eine beliebige Teilmenge $S\subset V$ betrachte die \textcolor{\texcol}{Menge der Schnittkanten 
+\[C=\{\{u,v\}\in E\colon u\in S,v\in V\setminus S\}\]}
+Die \textcolor{\texcol}{leichteste} Kante in $C$ kann in einem minimalem Spannbaum verwendet werden.
+
+\subsection{Kreiseigenschaft\index{Kreiseigenschaft}}
+Die schwerste Kante auf einem Kreis wird nicht für den minimalen Spannbaum verwendet.
+
+\subsection{Jarník-Prim-Algorithmus\index{Jarník-Prim-Algorithmus}}
+\begin{algorithm}[H]
+\caption{jpMST}
+\KwData{$G=(V,E)$: ungerichteter Graph(zusammenhängend)}
+\DontPrintSemicolon
+$T\coloneqq \langle\rangle$\;
+$S\coloneqq\{ s\}$ für einen beliebigen Startknoten\;
+\For{$i=1$, $i\leq |V|-1$}{
+	\tcc{Hier kann gut eine Prioritätsliste\index{Prioritätslist} verwendet werden}
+	finde $(u,v)$, welche die \textcolor{\texcol}{Schnitteigenschaft} für $S$ erfüllt\;
+	 $S\coloneqq S\cup\{ v\}$\;
+	 $T\coloneqq T\cup\{ (u,v)\}$\;}
+return $(S,T)$
+\end{algorithm}
+
+\paragraph{Laufzeit} liegt in $O((m+n)\log(n))$ mit unseren Heaps und $O(m+n\log(n))$ mit Fibonacci-Heaps\index{Fibonacci-Heap}
+
+\paragraph{Vorteile} 
+\begin{itemize}
+\item Asymptotisch gut für $m\gg n$.
+\end{itemize}
+
+\subsection{Kruskals Algorithmus}\index{Kruskals Algorithmus}
+\begin{algorithm}[H]
+\caption{Kruskals Algorithmus}
+\KwData{$G=(V,E)$: ungerichteter Graph}
+\DontPrintSemicolon
+\tcc{Hier wird der Union-Find verwendet}
+$Tc\coloneqq$ UnionFind($|V|$)\;
+$T\coloneqq \langle\rangle$\;
+\For{each $(u,v)\in E$ in absteigender Reihenfolge zum Gewicht}{
+	\tcc{Hier wird Schnitt\index{Schnitteigenschaft}-/ Kreiseigenschaft\index{Kreiseigenschaft} verwendet}
+	\If{$u$ und $v$ sind in verschiedenen Teilmengen von $Tc$}{
+		$T\coloneqq T\cup\{ (u,v)\}$\;
+		$Tc$.union($u,v$)\;
+		}}
+return $T$
+\end{algorithm}
+
+\paragraph{Union-Find\index{Union-Find}}
+Wir benötigen eine effiziente Datenstruktur, um zu erkennen, ob zwei Knoten in verschiedenen Teilbäumen sind.\\
+Diese Datenstruktur biete folgende Funktionen an:
+\begin{itemize}
+\item \textbf{union($i,j\colon\mathbb{N}$)} fügt die Blöcke, die $i$ und $j$ enthalten zu einem neuen Block zusammen. Hier wird \textcolor{\texcol}{nach der Größe des Rangs} zusammengefügt.
+\item \textbf{find($i\colon\mathbb{N}$)} gibt einen \textcolor{\texcol}{eindeutigen Identifier} für den Block der $i$ enthält zurück. Bei den find aufrufen kann \textcolor{\texcol}{Pfadkompression} angewendet werden.
+\item Die Zeitkomplexität von $m\times$\textbf{find} und $n\times$\textbf{union} brauchen Zeit $O(m\alpha_T(m,n)$ wobei $\alpha_T$ das Inverse der Ackermannfunktion\index{Ackermannfunktion} ist.
+%TODO heißt das jetzt, dass n mal union in "O(1)" ist?
+\end{itemize}
+
+\paragraph{Laufzeit} Mit der Union-Find\index{Union-Find} Datenstruktur liegt der Algorithmus von Kurskal in $O(m\log(m))$ (\textcolor{\texcol}{Sortierung} ist ausschlaggebend).
+
+\paragraph{Vorteile}
+\begin{itemize}
+\item gut für $m = O(n)$
+\item braucht nur Kantenliste.
+\item Profitiert von schnellem Sortieren
+\end{itemize}
+
+\subsection{Sonstiges}
+\begin{itemize}
+\item Es gibt das Steinerbaumproblem\index{Steinerbaumproblem}, bei dem nur eine Teilmenge aller Knoten im Spannbaum enthalten sein müssen. Dies ist eine Verallgemeinerung des MST-Problems und ist \textcolor{\texcol}{NP-Vollständig}
+\end{itemize}
+
+\section{Optimierung}
+
+\subsection{Lineare Programmierung\index{lineares Programm}}
+Ein \textcolor{\texcol}{lineares Programm} setzt sich aus \textcolor{\texcol}{$n$ Variablen} und \textcolor{\texcol}{$m$ Constraints} (Einschränkungen) Zusammen. Zusätzlich haben wir eine \textcolor{\texcol}{lineare Kostenfunktion $f(x)=c\cdot x$}.\\
+Lineare Programme lassen sich in \textcolor{\texcol}{polynomieller Zeit} lösen.
+
+\paragraph{Ganzzahlige Lineare Programmierung} Lassen nur ganzzahlige Variablen zu. Häufig auch nur die Werte 1 oder 0. Dies Probleme sind \textcolor{\texcol}{NP-Schwer} es gibt aber viele Möglichkeiten für Näherungslösungen.
+
+\subsection{Dynamische Programmierung}
+Ist Anwendbar, wenn das \textcolor{\texcol}{Optimalitätsprinzip}\index{Optimalitätsprinzip} gilt. Das bedeutet, dass optimale Lösungen aus optimalen Lösungen für Teilprobleme bestehen und bei mehrere optimalen Lösungen es egal ist, welche benutzt wird.
+
+\paragraph{Rucksackproblem\index{Rucksackproblem}}
+Die zentrale Eigenschaft, die wir beim Rucksackproblem ausnutzen ist, dass für die \textcolor{\texcol}{Profitfunktion $P(i,C)$}, die den maximalen Profit bei der Verwendung der ersten i Gegenstände (müssen nicht zwangsweise sortiert sein) mit einer Kapacität von $C$ gilt:
+\[\forall 1\leq i\leq n\colon P(i,C)=\max\{P(i-1,C), P(i-1,C-w_i)+p_i\}\]
+Auf Basis dieser Aussage können wir nun eine Tabelle von unten nach oben \textcolor{\texcol}{ausfüllen} und so die optimale Lösung für Kapazität $C$ \textcolor{\texcol}{rekonstruieren}.
+
+\subsection{Systematische Suche\index{Systematische Suche}}
+
+Bei diesem Algorithmenschema werden alle (sinnvollen) Möglichkeiten der Problemlösung ausprobiert. Sie finden die \textcolor{\texcol}{optimale Lösung}.
+
+\paragraph{Branch-And-Bound\index{Branch-And-Bound}}
+Beispiel für systematische Suche.\\
+\begin{algorithm}[H]
+\caption{bbKnapsack}
+\KwData{$(p_1,\dots ,p_n)$: ProfitVektor, $(w_1,\dots ,w_n)$: GewichtVektor, $C$: Kapazität}
+\DontPrintSemicolon
+\tcc{Profit- und KostenVektor sind in absteigender Reihenfolge zum Profitverhältnis $\frac{p_i}{w_i}$ sortiert.}
+\tcc{wahlweise kann \^{x} auf den NullVektor gesetzt werden. \^{x} repräsentiert die derzeitig beste gefundene Lösung}
+$\hat{x}\coloneqq \text{heuristicKnapsack}((p_1,\dots ,p_n),(w_1,\dots ,w_n),C)\colon\mathbb{L}$\;
+\tcc{Menge von unvollständigen Lösungen, an denen in \textcolor{\texcol}{recurse} gearbeitet wird }
+$x\colon\mathbb{L}$\;
+\textcolor{\texcol}{recurse}$(1,C,0)$\;
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{recurse}
+\KwData{$i\colon\mathbb{N}, C\colon\text{Kapazität}, P\colon\text{Profit}$}
+\DontPrintSemicolon
+\tcc{Gut geschätzte \textbf{\textcolor{\texcol}{obere!}} Schranke für den derzeitigen Lösungsansatz}
+$u\coloneqq P + \text{\textcolor{\texcol}{upperBound}}((p_1,\dots ,p_n),(w_1,\dots ,w_n),C)$\;
+\tcc{Obere Schranke muss besser sein als derzeitig beste Lösung}
+\If{$u>p\cdot\hat{x}$}{
+	\tcc{Neue beste Lösung gefunden}
+	\eIf{$i>n$}{
+		$\hat{x}\coloneqq x$}{
+		\tcc{Objekt kann noch rein gepackt werden}
+		\If{$w_i\leq C$}{
+			$x_i\coloneqq 1$\;
+			\textcolor{\texcol}{recurse$(i+1,C-w_i,P+p_i)$}}
+		\tcc{Ist obere Schranke immer noch gut genug?}
+		\If{$u>p\cdot\hat{x}$}{
+			$x_i\coloneqq 0$\;
+			\textcolor{\texcol}{recurse$(i+1,C,P)$}}}}
+\end{algorithm}
+
+\paragraph{Laufzeit} Im Schlechtesten Fall $O(2^n)$ im Mittel aber besser. Hängt von der Qualität der \textcolor{\texcol}{upperBound} Methode ab. Findet die \textcolor{\texcol}{optimale Lösung}.
+
+\subsection{Lokale Suche\index{lokale Suche}}
+Zuerst wird eine Lösung $x\in \mathbb{L}$ (mehr oder weniger zufällig) ausgewählt und anschließend eine \textcolor{\texcol}{Lösungsumgebung $U(x)$} berechnet. In dieser Lösungsumgebung wird \textcolor{\texcol}{lokal optimiert} (und $U$ geupdated).\\
+Problematisch ist, dass so nur lokale Optima gefunden werden. $U$ muss gut definiert werden
+
+%TODO Lokale Suche ausführlicher und Evolutionäre Algorithmen?
+
+\newpage
+\glqq Da ich den kürzesten Weg durch die Vorlesung gefunden habe, sind wir jetzt schon fertig.\grqq{} -\dozent
+
+\printindex
+
+\end{document}
